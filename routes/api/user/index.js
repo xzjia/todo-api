@@ -23,5 +23,13 @@ module.exports = services => {
       .catch(err => res.status(400).send(err.message));
   });
 
+  router.post("/:id/todos", (req, res) => {
+    return services.db.todos
+      .create({ userId: req.params.id, content: req.body.content })
+      .then(todos => todos.map(todo => todo.serialize()))
+      .then(todos => res.status(200).json(todos))
+      .catch(err => res.status(400).send(err.message));
+  });
+
   return router;
 };

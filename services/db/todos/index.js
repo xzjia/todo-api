@@ -1,21 +1,24 @@
 const moment = require("moment");
 
-const todo = function(dbTodo) {
+const Todo = function(dbTodo) {
   this.id = dbTodo.id;
-  this.userId = dbTodo.user_id;
+  this.username = dbTodo.username;
   this.content = dbTodo.content;
   this.createAt = new Date(dbTodo.created_at);
 };
 
-todo.prototype.serialize = function() {
+Todo.prototype.serialize = function() {
   return {
     id: this.id,
-    userId: this.userId,
+    username: this.username,
     content: this.content,
     createAt: moment(this.createAt).format("hh:mm:ss")
   };
 };
 
 module.exports = knex => {
-  return {};
+  return {
+    create: require("./create")(knex, Todo),
+    list: require("./list")(knex, Todo)
+  };
 };
