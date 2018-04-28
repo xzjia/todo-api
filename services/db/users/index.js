@@ -15,5 +15,7 @@ User.prototype.serialize = function() {
 };
 
 module.exports = knex => {
-  return {};
+  return {
+    create: require("./create")(knex, User)
+  };
 };
