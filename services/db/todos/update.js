@@ -22,7 +22,6 @@ module.exports = (knex, Todo) => {
           .where("todos.id", params.todoId);
       })
       .then(todos => {
-        console.log("****** In update", todos);
         return new Todo(todos.pop());
       });
   };
