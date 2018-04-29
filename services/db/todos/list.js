@@ -1,6 +1,8 @@
+const Promise = require("bluebird");
+
 module.exports = (knex, Todo) => {
   return params => {
-    return Promise.resolve(
+    return Promise.try(() =>
       knex("todos")
         .column(
           "todos.id AS id",
@@ -11,9 +13,16 @@ module.exports = (knex, Todo) => {
           "finished_at"
         )
         .innerJoin("users", "users.id", "=", "todos.user_id")
-        .where("todos.user_id", params.userId)
-    ).then(todos => {
-      return todos.map(todo => new Todo(todo));
-    });
+        .where("users.id", params.userId)
+        .orderBy("id")
+    )
+      .then(todos => {
+        return todos.map(todo => {
+          return new Todo(todo);
+        });
+      })
+      .catch(err => {
+        throw err;
+      });
   };
 };

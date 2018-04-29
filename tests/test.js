@@ -36,10 +36,10 @@ describe("users", () => {
 
     context("when good params are given", () => {
       before(() => {
-        params.username = "rp-3";
+        params.username = "apple";
       });
 
-      afterEach(() => knex("users").del()); // delete all users after each spec
+      afterEach(() => knex("users").del());
 
       it("creates a user", () =>
         db.users.create(params).then(user => {
@@ -65,7 +65,8 @@ describe("users", () => {
 describe("user_todos", () => {
   let userId;
   let anotherUserId;
-  const content = "Finish API project";
+  const content = "Finish eating apple.";
+  const anotherContent = "Finish eating banana.";
 
   before(() =>
     db.users
@@ -90,10 +91,14 @@ describe("user_todos", () => {
     after(() => knex("todos").del());
 
     it("creates a todo", () =>
-      db.todos.create({ userId, content }).then(todos => {
-        expect(todos[0]).to.include({ username: "apple", content });
-        expect(todos[0].id).to.be.a("number");
-        expect(todos[0].createdAt).to.be.a("Date");
+      db.todos.create({ userId, content }).then(todo => {
+        expect(todo).to.include({
+          username: "apple",
+          content,
+          status: "pending"
+        });
+        expect(todo.id).to.be.a("number");
+        expect(todo.createdAt).to.be.a("Date");
       }));
   });
 
@@ -107,8 +112,8 @@ describe("user_todos", () => {
             status: "pending"
           },
           {
-            user_id: userId,
-            content,
+            user_id: anotherUserId,
+            content: anotherContent,
             status: "pending"
           }
         ])
@@ -116,7 +121,7 @@ describe("user_todos", () => {
         .then(() =>
           knex("todos").insert({
             user_id: userId,
-            content,
+            content: anotherContent,
             status: "pending"
           })
         )
@@ -124,9 +129,64 @@ describe("user_todos", () => {
 
     after(() => knex("todos").del());
 
-    it("lists the right number of todos", () =>
+    it("lists the right number of todos", () => {
+      db.todos.list({ userId }).then(todos => {
+        expect(todos.length).to.equal(2);
+      });
+      db.todos.list({ userId: anotherUserId }).then(todos => {
+        expect(todos.length).to.equal(1);
+      });
+    });
+
+    it("lists the right todos", () =>
+      db.todos.list({ userId }).then(todos => {
+        expect(todos[0]).to.include({
+          username: "apple",
+          content,
+          status: "pending"
+        });
+        expect(todos[0].id).to.be.a("number");
+        expect(todos[0].createdAt).to.be.a("Date");
+        expect(todos[1]).to.include({
+          username: "apple",
+          content: anotherContent,
+          status: "pending"
+        });
+        expect(todos[1].id).to.be.a("number");
+        expect(todos[1].createdAt).to.be.a("Date");
+      }));
+  });
+
+  xdescribe("#update and #delete", () => {
+    let todoId;
+    before(() =>
       db.todos
-        .list({ userId })
-        .then(todos => expect(todos.length).to.equal(3)));
+        .create({
+          userId,
+          content: "todo waiting to be finished"
+        })
+        .then(todo => {
+          console.log("******** In before block\n", todo);
+          todoId = todo.id;
+        })
+    );
+
+    after(() => knex("todos").del());
+
+    it("update the given todo status", () => {
+      console.log("Before test\n", userId + "\n", todoId);
+      db.todos.update({ userId, todoId }).then(todo => {
+        expect(todo.status).to.equal("finished");
+      });
+    });
+
+    it("delete the given todo status", () => {
+      console.log("Before test 2\n", userId + "\n", todoId);
+      db.todos.delete({ userId, todoId }).then(() =>
+        db.todos.list({ userId }).then(todos => {
+          expect(todos.length).to.equal(0);
+        })
+      );
+    });
   });
 });

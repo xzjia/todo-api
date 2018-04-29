@@ -26,7 +26,7 @@ module.exports = services => {
   router.post("/:id/todos", (req, res) => {
     return services.db.todos
       .create({ userId: req.params.id, content: req.body.content })
-      .then(todos => todos.map(todo => todo.serialize()))
+      .then(todo => todo.serialize())
       .then(todos => res.status(201).json(todos))
       .catch(err => res.status(400).send(err.message));
   });
@@ -34,7 +34,7 @@ module.exports = services => {
   router.put("/:id/todos/:todoId", (req, res) => {
     return services.db.todos
       .update({ userId: req.params.id, todoId: req.params.todoId })
-      .then(todos => todos.map(todo => todo.serialize()))
+      .then(todo => todo.serialize())
       .then(todos => res.status(200).json(todos))
       .catch(err => res.status(400).send(err.message));
   });
@@ -42,7 +42,6 @@ module.exports = services => {
   router.delete("/:id/todos/:todoId", (req, res) => {
     return services.db.todos
       .delete({ userId: req.params.id, todoId: req.params.todoId })
-      .then(todos => todos.map(todo => todo.serialize()))
       .then(todos => res.status(204).json(todos))
       .catch(err => res.status(400).send(err.message));
   });

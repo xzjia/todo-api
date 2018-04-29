@@ -5,7 +5,7 @@ const router = express.Router();
 const userRouter = require("./user");
 
 module.exports = services => {
-  router.use("/users/v1.0", userRouter(services));
+  router.use("/v1.0/users", userRouter(services));
 
   return router;
 };

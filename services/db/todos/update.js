@@ -2,10 +2,7 @@ module.exports = (knex, Todo) => {
   return params => {
     return Promise.resolve(
       knex("todos")
-        .where({
-          user_id: params.userId,
-          id: params.todoId
-        })
+        .where("id", params.todoId)
         .update({
           status: "finished",
           finished_at: knex.fn.now()
@@ -22,10 +19,11 @@ module.exports = (knex, Todo) => {
             "finished_at"
           )
           .innerJoin("users", "users.id", "=", "todos.user_id")
-          .where("todos.user_id", params.userId);
+          .where("todos.id", params.todoId);
       })
       .then(todos => {
-        return todos.map(todo => new Todo(todo));
+        console.log("****** In update", todos);
+        return new Todo(todos.pop());
       });
   };
 };
