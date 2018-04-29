@@ -6,7 +6,8 @@ module.exports = (knex, Todo) => {
     return Promise.resolve(
       knex("todos").insert({
         user_id: userId,
-        content
+        content,
+        status: "pending"
       })
     )
       .then(() => {
@@ -15,7 +16,9 @@ module.exports = (knex, Todo) => {
             "todos.id AS id",
             "users.username AS name",
             "content",
-            "todos.created_at"
+            "status",
+            "todos.created_at",
+            "finished_at"
           )
           .innerJoin("users", "users.id", "=", "todos.user_id")
           .where("todos.user_id", userId);
