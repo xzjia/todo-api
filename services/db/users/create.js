@@ -39,7 +39,6 @@ module.exports = (knex, User) => {
       })
       .then(([users, jwt]) => {
         const user = new User(users.pop());
-        console.log("***** 42 and returning", user, jwt);
         return [user, jwt];
       })
       .catch(err => {
