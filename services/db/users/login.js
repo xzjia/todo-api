@@ -3,11 +3,7 @@ const jwt = require("jsonwebtoken");
 
 const salfRounds = 10;
 const Promise = require("bluebird");
-
-const validateUsername = (username, password) => {
-  //TODO: add validation logic for password
-  return typeof username === "string" && username.replace(" ", "").length > 3;
-};
+const list = require("./list");
 
 module.exports = (knex, User) => {
   return params => {
@@ -16,16 +12,17 @@ module.exports = (knex, User) => {
     const password = params.password ? params.password : "default";
 
     return Promise.try(() => {
-      if (!validateUsername(username, password)) {
-        throw new Error("Invalid username/password.");
-      }
+      return list({ username });
     })
-      .then(() => bcrypt.hash(password, salfRounds))
-      .then(hashedPassword => {
-        return knex("users").insert({
-          username,
-          password: hashedPassword
-        });
+      .then(foundUser => {
+        if (foundUser.length === 0) {
+          throw new Error("No user found");
+        }
+        const passwordIsValid = bcrypt.compareSync(
+          req.body.password,
+          user.password
+        );
+        if (!passwordIsValid) throw new Error("Wrong password");
       })
       .then(() => {
         return Promise.all([
@@ -39,13 +36,9 @@ module.exports = (knex, User) => {
       })
       .then(([users, jwt]) => {
         const user = new User(users.pop());
-        console.log("***** 42 and returning", user, jwt);
         return [user, jwt];
       })
       .catch(err => {
-        if (err.message.match("duplicate key value")) {
-          throw new Error("Username already exists.");
-        }
         console.log(err);
         throw err;
       });
