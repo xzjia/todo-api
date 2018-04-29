@@ -6,9 +6,9 @@ module.exports = function(config) {
   const knex = Knex({
     client: config.client,
     port: config.connection.port,
-    connection: `postres://postgres:postgres@${config.connection.host}/${
-      config.connection.database
-    }`
+    connection: `postres://${config.connection.user}:${
+      config.connection.password
+    }@${config.connection.host}/${config.connection.database}`
   });
 
   return {

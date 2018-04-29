@@ -5,7 +5,7 @@ const Todo = function(dbTodo) {
   this.username = dbTodo.name;
   this.content = dbTodo.content;
   this.status = dbTodo.status;
-  this.createAt = new Date(dbTodo.created_at);
+  this.createdAt = new Date(dbTodo.created_at);
   if (dbTodo.finished_at) {
     this.finishedAt = new Date(dbTodo.finished_at);
   }
@@ -17,7 +17,7 @@ Todo.prototype.serialize = function() {
     username: this.username,
     content: this.content,
     status: this.status,
-    createAt: moment(this.createAt).format("hh:mm:ss"),
+    createdAt: moment(this.createdAt).format("hh:mm:ss"),
     finishedAt: this.finishedAt
       ? moment(this.finishedAt).format("hh:mm:ss")
       : "Not finished yet."
