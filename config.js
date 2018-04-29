@@ -11,6 +11,8 @@ module.exports = {
     port: 5432
   },
 
+  secret: "supersecret",
+
   // port for server to run on
   express: {
     port: 3000

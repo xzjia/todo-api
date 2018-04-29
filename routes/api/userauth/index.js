@@ -9,7 +9,10 @@ module.exports = services => {
     return services.db.users
       .create({ username: req.body.username, password: req.body.password })
       .then(([user, jwt]) => {
-        res.status(201).json(user.serialize());
+        const result = user;
+        result["auth"] = true;
+        result["token"] = jwt;
+        res.status(201).json(result);
       })
       .catch(err => {
         // TODO: maybe return the token

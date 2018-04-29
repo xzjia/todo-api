@@ -1,4 +1,6 @@
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+
 const salfRounds = 10;
 const Promise = require("bluebird");
 
@@ -26,19 +28,26 @@ module.exports = (knex, User) => {
         });
       })
       .then(() => {
-        return knex("users")
-          .where({ username })
-          .select();
+        return Promise.all([
+          knex("users")
+            .where({ username })
+            .select(),
+          jwt.sign({ id: username }, "supersecret", {
+            expiresIn: 86400
+          })
+        ]);
       })
-      .then(users => {
-        return new User(users.pop());
+      .then(([users, jwt]) => {
+        const user = new User(users.pop());
+        console.log("***** 42 and returning", user, jwt);
+        return [user, jwt];
       })
       .catch(err => {
         if (err.message.match("duplicate key value")) {
           throw new Error("Username already exists.");
         }
-
-        throw err;
+        console.log(err);
+        // throw err;
       });
   };
 };
