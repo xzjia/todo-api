@@ -1,0 +1,97 @@
+swagger: '2.0'
+info:
+  version: 0.1.0
+  title: Simple TODO List API
+securityDefinitions:
+  key:
+    type: apiKey
+    in: header
+    name: x-access-token
+security:
+  - key: []
+consumes:
+  - application/json
+produces:
+  - application/json
+schemes:
+  - http
+  - https
+
+paths:
+
+
+
+  /users/{userId}/todos:
+    parameters:
+      - type: string
+        name: userId
+        in: path
+        required: true
+    get:
+      tags: ["todos"]
+      operationId: find
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/todo"
+
+    post:
+      tags: ["todos"]
+      operationId: addOne
+      parameters:
+        - name: body
+          in: body
+          schema:
+            $ref: "#/definitions/todo"
+      responses:
+        '201':
+          description: Created
+          schema:
+            $ref: "#/definitions/todo"
+        default:
+          description: error
+          schema:
+            $ref: "#/definitions/todo"
+            
+    put:
+      tags: ["todos"]
+      operationId: updateOne
+      parameters:
+        - name: body
+          in: body
+          schema:
+            $ref: "#/definitions/todo"
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: "#/definitions/todo"
+            
+    delete:
+      tags: ["todos"]
+      operationId: destroyOne
+      responses:
+        '204':
+          description: Deleted
+        default:
+          description: error
+definitions:
+  todo:
+    type: object
+    required:
+      - content
+    properties:
+      id:
+        type: integer
+        format: int64
+        readOnly: true
+      content:
+        type: string
+        minLength: 1
+      status:
+        type: string
+      created_at:
+        type: string
